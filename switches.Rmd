@@ -1,0 +1,42 @@
+---
+title: "Models to Handle Treatment Switches in Clinical Trials"
+output: html_notebook
+---
+
+# Rank-preserving structural failed time model
+
+```{r}
+library(rpsftm)
+
+head(immdef)
+with(immdef, table(def, imm))
+
+survdiff(Surv(progyrs, prog) ~ imm, data = immdef)
+survfit(Surv(progyrs, prog) ~ imm, data = immdef)
+coxph(Surv(progyrs, prog) ~ imm, data = immdef)
+noadj = survfit(Surv(progyrs, prog) ~ imm, data = immdef)
+plot(noadj, main = "KM w/o adjustment", xlab = "Time", ylab = "Survival", lwd = 2, col = 1:3)
+
+```
+
+# RPSFTM package
+
+?? How censoring time was handled, e.g. the re-censoring the process
+?? What is the HR result?
+
+```{r}
+immdef$rx = 1 - immdef$xoyrs / immdef$progyrs
+rpsftm_fit = rpsftm(formula = Surv(progyrs, prog) ~ rand(imm, rx), data = immdef, censor_time = censyrs)
+summary(rpsftm_fit)
+str(rpsftm_fit)
+rpsftm_fit$fit
+
+```
+
+# IPCWSWITCH
+
+?? How exactly the weights were derived and applied
+
+```{r}
+
+```
