@@ -38,6 +38,21 @@ $$f(t) = \lambda * exp(-\lambda t)$$
 # Event density function
 
 ```{r}
+k = 0.1
+t = 1:1e3 / 1e2 
+y = k * exp(-k * t)
+plot(t, y)
+```
+
+# some calculation 
+
+> pexp(6, rate = k) = 0.2
+
+$$S(t) = exp(-\lambda t) = p$$
+
+$$- log(p) / t = \lambda$$
+
+```{r}
 k = 2
 t = 1:1e3 / 1e2 
 y = k * exp(-k * t)

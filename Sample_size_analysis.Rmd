@@ -65,7 +65,6 @@ y1$T
 y2 = nSurv(hr0 = 1, hr = 0.5, lambdaC = 1/5, alpha = 0.05, beta = 0.2, eta = 0.1, gamma = 20, R = 5, T = 50)
 y2$n
 y2$T
-
 ```
 
 ## Nitty-gritty of the exponential model 
