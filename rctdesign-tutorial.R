@@ -9,6 +9,8 @@ RCTversion()
 # Point estimation will be derived, or by simulation?
 # Is there a cost function?
 
+# Stopping boundaries of futility and efficacy were detemined together, how were they determined?
+
 y1 = nSurv(sided = 1, ratio = 1, alpha = 0.025, beta = 0.1, hr0 = 1, hr = 0.5, 
            lambdaC = 1/5, eta = 1/10, gamma = 20, R = 8, T = 20)
 
@@ -19,6 +21,7 @@ y1$T
 d2 =  seqDesign(prob.model= "hazard", arms= 2, ratio= c(1,1),
                 null.hypothesis= 1, alt.hypothesis= 0.5,
                 test.type= "less", size= 0.025, power= 0.90)
+
 d2$parameters
 
 d3 =  seqDesign(prob.model= "hazard", arms= 2, ratio= c(1,1),
