@@ -118,5 +118,3 @@ var(xh2)
 ```
 
 ## Questions
-
-> What is competing risk?  
