@@ -115,6 +115,6 @@ Cox proposed partial maximal likelihood method to estimate the model parameters.
 
 ## How the partial maximal likelihood method was done? 
 
-# Kaplan Meier curve and Logrank test
+## Kaplan Meier curve and Logrank test
 
-# How are the p-values look like for Logrank test, Weibull modek, and Cox model
+## How are the p-values look like for Logrank test, Weibull modek, and Cox model
