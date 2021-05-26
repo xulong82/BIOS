@@ -1,0 +1,117 @@
+> http://www.drizopoulos.com/courses/emc/ep03_%20survival%20analysis%20in%20r%20companion
+
+To be continued ...
+
+## Cox PH model
+
+Baseline hazard refers to the hazard rate when the covariate is set to its baseline, i.e. 0 for numerical covariate. 
+This may not be confused with the baseline time.
+Proportional Hazard (PH) model assumes that: over the time, hazard ratio is constant for two different values of the covariate.
+
+## Stratified PH model
+
+The stratified model *allows* different baseline hazard function for each stratum of the stratification factor.
+Meanwhile, effect of the stratification factor, in term of hazard ratio, is not estimated.
+
+This is a remedy to deal with covariates of non-proportional effects, which violates the PH model assumption and therefore not appropriate as model covariates.
+
+Note that while stratified Cox PH model *allows* different baseline hazard functions of different strata, Cox PH model in general does not estimate the baseline functions. 
+Cox PH only estimates hazard ratio of the model covariates.
+
+Baseline hazard function can be estimated by using survfit(xx) function, while xx can be a stratified Cox PH model output
+
+```{r, include = F}
+xx = coxph(OS ~ A + strata(B))
+survfit(xx)
+plot(survfit(xx))
+```
+
+## Clinical Trials Survival Analysis - Execution 
+
+```{r}
+library("survival")
+data(lung, stanford2, package = "survival")
+
+lung <- lung %>% mutate(sex = factor(sex, levels = 1:2, labels = c("male", "female")))
+lung <- lung %>% filter(complete.cases(time, status, sex, age, ph.karno))
+```
+
+Function::Surv()
+> This is to specify the type of survival data, namely, right censored, left censored, interval censored.
+
+Function::survfit()
+> This is to calculate the Kaplan-Meler estimate.
+
+```{r}
+KMfit = survfit(Surv(time, status) ~ 1, data = stanford2)
+
+KMfit # basic outputs include: number of subjects, number of events, median survival time and its 95% confidence interval
+
+summary(KMfit, times = c(0, 1e3, 2e3)) # use summary method and its time arguments, we obtain survival probability at specific times
+
+quantile(KMfit, probs = 1 - c(1, 0.5, 0.25)) 
+# use quantile method and its probs arguments, we obtain corresponding follow-up times at which the survival probability takes specific values
+# we also obtain the lower and upper limits of the 95% confidence intervals for the quantiles we asked
+# we specify one minus target survival probability because the quantile method works under the cumulative distribution function convention
+# and CDF equals one minus survival probability
+
+plot(KMfit, xlab = "Time to Death (days)", ylab = "Survival Probability", main = "Kaplan-Meier Estimate of S(t) for the Stanford Data")
+```
+
+## Statistical Tests
+
+Hypothesis testing of *one* grouping variable, i.e. test whether survival functions of different groups of subjects differ significantly
+
+```{r}
+logrank = survdiff(Surv(time, status == 2) ~ sex, data = lung) # log-rank test: the first and the most widely used test
+petopeto = survdiff(Surv(time, status == 2) ~ sex, data = lung, rho = 1) # Peto & Peto Gehan-Wilcoxon test
+
+# log-rank test is the most powerful test when proportional hazard (PH) assumption is satisfied
+# we can plot the cumulative KM hazard function for the two groups to test the PH assumption
+# when PH is satisfied, the two curves will be proportional to each other, i.e. steadily grow away from each other
+
+KMfit = survfit(Surv(time, status == 2) ~ sex, data = lung)
+
+plot(KMfit)
+plot(KMfit, fun = "cumhaz") # cumulative hazards plot
+```
+
+## How to understand cumulative hazards?
+
+## Accelerated Failure Time Models
+
+Function::survfit() in the survival package fits AFT models
+
+```{r}
+expfit = survreg(Surv(time, status == 2) ~ sex, data = lung, dist = "exponential") # dist argument specifies distribution of the survival time 
+weibullfit = survreg(Surv(time, status == 2) ~ sex, data = lung) # default is the Weibull distribution
+
+lognormfit = survreg(Surv(time, status == 2) ~ sex, data = lung, dist = "lognormal") # log-normal distribution
+loglogisfit = survreg(Surv(time, status == 2) ~ sex, data = lung, dist = "loglogistic") # log-logistic distribution
+```
+
+## Effects plot to visualize complex interactive models
+
+```{r}
+expand.grid() # create a dataset of all possible combinations of the model covariate
+predict() # generate model predictions (in the log survival time scale) and the corresponding standard errors
+lattice::xyplot() # make the plot
+```
+
+## Hypothesis tests
+
+> when we want to test whether we can drop all the complex terms
+> A statistical comparison between two nested models can be performed with a likelihood ratio test by funtion anova()
+
+```{r}
+fit_alt <- survreg(Surv(years, status2) ~ (drug + sex) * (age + I(age^2)), data = pbc2.id)
+fit_null <- survreg(Surv(years, status2) ~ drug + sex + age, data = pbc2.id)
+anova(fit_null, fit_alt)
+```
+
+## Residules
+
+> we can use residules of the model to check whether the assumed distribution of survival times fits the observed data sufficiently well
+
+## Cox PH model
+
